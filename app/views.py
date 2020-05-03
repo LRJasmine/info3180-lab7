@@ -18,27 +18,31 @@ from werkzeug.utils import secure_filename
 
 @app.route('/api/upload', methods=["POST"])
 def upload():
+    
     uploadform = UploadForm()
+    
     if request.method == "POST":
         
         if uploadform.validate_on_submit():
-            photo = uploadform.photo.data
+            
             description = uploadform.description.data
+            photo = uploadform.photo.data
             photofilename = secure_filename(photo.filename)
             photo.save(os.path.join(app.config['UPLOAD_FOLDER'], photofilename))
             
             upload = [
                 {
                     "message": "File Upload Successful", 
-                    "filename": "you-uploaded-file.jpg", 
-                    "description": "Some description for your image" 
+                    "filename": photofilename, 
+                    "description": description 
                     
                 }
                 ]
-            flash('', 'success')
-            return jsonify(errors=form_errors(uploadform), upload=upload)
+            return jsonify(upload=upload)
+        else:
+            return jsonify(errors=form_errors(uploadform))
 
-    return render_template('upload.html', form=uploadform)
+    return render_template('index.html', form=uploadform)
 
 
 # Please create all new routes and view functions above this route.
